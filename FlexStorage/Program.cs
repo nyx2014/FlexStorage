@@ -1,7 +1,7 @@
 using DokanNet;
 using System;
 
-namespace DokanNetMirror
+namespace FlexStorage
 {
     internal class Programm
     {

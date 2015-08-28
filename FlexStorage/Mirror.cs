@@ -6,7 +6,7 @@ using System.Linq;
 using System.Security.AccessControl;
 using FileAccess = DokanNet.FileAccess;
 
-namespace DokanNetMirror
+namespace FlexStorage
 {
     internal class Mirror : IDokanOperations
     {
