@@ -10,7 +10,8 @@ namespace DokanNetMirror
 {
     internal class Mirror : IDokanOperations
     {
-        private readonly string _path;
+        private readonly bool debugMode = true;
+        private readonly string _path, _driveLetter, _volumeLabel;
 
         private const FileAccess DataAccess = FileAccess.ReadData |
                                               FileAccess.WriteData |
@@ -25,11 +26,14 @@ namespace DokanNetMirror
                                                    FileAccess.Delete |
                                                    FileAccess.GenericWrite;
 
-        public Mirror(string path)
+        public Mirror(string path, string driveLetter, string volumeLabel)
         {
             if (!Directory.Exists(path))
-                throw new ArgumentException("path");
+                throw new ArgumentException("Directory "+path + " Not Exists!");
             _path = path;
+
+            _driveLetter = driveLetter;
+            _volumeLabel = volumeLabel;
         }
 
         private string GetPath(string fileName)
@@ -427,21 +431,47 @@ namespace DokanNetMirror
 
         public DokanResult GetDiskFreeSpace(out long free, out long total, out long used, DokanFileInfo info)
         {
-            var dinfo = DriveInfo.GetDrives()
-                .Where(di => di.RootDirectory.Name == Path.GetPathRoot(_path + "\\")).Single();
+//            var dinfo = DriveInfo.GetDrives()
+//                .Where(di => di.RootDirectory.Name == Path.GetPathRoot(_path + "\\")).Single();
+//
+//            used = dinfo.AvailableFreeSpace;
+//            total = dinfo.TotalSize;
+//            free = dinfo.TotalFreeSpace;
+//            return DokanResult.Success;
+            if (debugMode)
+            {
+                System.Console.WriteLine("Getting File Info...");
+            }
 
-            used = dinfo.AvailableFreeSpace;
-            total = dinfo.TotalSize;
-            free = dinfo.TotalFreeSpace;
+            used = 0;
+            total = 0;
+            free = 0;
+
+            var drives = DriveInfo.GetDrives();
+            foreach (DriveInfo drive in drives)
+            {
+                if (drive.IsReady == true && drive.Name != _driveLetter+":\\" )
+//                if (drive.IsReady == true && drive.RootDirectory.Name != Path.GetPathRoot(_path+"\\"))
+                {
+                    System.Console.WriteLine("Adding " + drive.Name);
+
+                    used += drive.AvailableFreeSpace;
+                    total += drive.TotalSize;
+                    free += drive.TotalFreeSpace;
+                }
+            }
+           
+            System.Console.WriteLine("OK.");
             return DokanResult.Success;
         }
 
         public DokanResult GetVolumeInformation(out string volumeLabel, out FileSystemFeatures features,
                                                out string fileSystemName, DokanFileInfo info)
         {
-            volumeLabel = "DOKAN";
+//            volumeLabel = "Nyx";
+            volumeLabel = _volumeLabel;
 
-            fileSystemName = "DOKAN";
+            fileSystemName = "FlexStorage";
 
             features = FileSystemFeatures.CasePreservedNames | FileSystemFeatures.CaseSensitiveSearch |
                        FileSystemFeatures.PersistentAcls | FileSystemFeatures.SupportsRemoteStorage |
