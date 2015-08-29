@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DokanNet", "DokanNet\DokanN
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlexStorage", "FlexStorage\FlexStorage.csproj", "{01247A47-387C-4BB4-8068-31CB3F16BD9F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Loader", "Loader\Loader.csproj", "{76B3CCC3-3652-46A8-9C82-42A78E1BEE0A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,11 +23,12 @@ Global
 		{01247A47-387C-4BB4-8068-31CB3F16BD9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01247A47-387C-4BB4-8068-31CB3F16BD9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01247A47-387C-4BB4-8068-31CB3F16BD9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76B3CCC3-3652-46A8-9C82-42A78E1BEE0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76B3CCC3-3652-46A8-9C82-42A78E1BEE0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76B3CCC3-3652-46A8-9C82-42A78E1BEE0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76B3CCC3-3652-46A8-9C82-42A78E1BEE0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{01247A47-387C-4BB4-8068-31CB3F16BD9F} = {6AF2183D-1D93-414C-8FAC-C97E60078F4C}
 	EndGlobalSection
 EndGlobal
