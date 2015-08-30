@@ -41,12 +41,33 @@ namespace FlexStorage
             return _path + fileName;
         }
 
+        private string AutoGetPath(string filename)
+        {
+            Console.WriteLine("AGing "+filename);
+            foreach (var driveInfo in GetAvaliableDrives().Where(
+                driveInfo => Directory.Exists(driveInfo.Name + filename)))
+                return driveInfo.Name + filename;
+            return string.Empty;
+            //            return GetPath(filename);
+        }
+
+        private DriveInfo[] GetAvaliableDrives()
+        {
+            return DriveInfo.GetDrives()
+                .Where(d => d.IsReady == true && d.Name != _driveLetter + ":\\")
+                .ToArray();
+        }
+
         #region Implementation of IDokanOperations
 
         public DokanResult CreateFile(string fileName, FileAccess access, FileShare share, FileMode mode,
                                      FileOptions options, FileAttributes attributes, DokanFileInfo info)
         {
+            Console.WriteLine("CreateFile Running..."+fileName);
             var path = GetPath(fileName);
+//            Console.WriteLine("N"+fileName);
+//            Console.WriteLine("G"+GetPath(fileName));
+//            Console.WriteLine("A"+AutoGetPath(fileName));
 
             var pathExists = true;
             var pathIsDirectory = false;
@@ -118,11 +139,19 @@ namespace FlexStorage
 
         public DokanResult OpenDirectory(string fileName, DokanFileInfo info)
         {
-            string path = GetPath(fileName);
-            if (!Directory.Exists(path))
+            Console.WriteLine("OpenD :"+fileName);
+            var path = AutoGetPath(fileName);
+            if (path == null)
             {
                 return DokanResult.PathNotFound;
             }
+
+
+//            string path = GetPath(fileName);
+//            if (!Directory.Exists(path))
+//            {
+//                return DokanResult.PathNotFound;
+//            }
 
             try
             {
@@ -258,34 +287,79 @@ namespace FlexStorage
 
         public DokanResult FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info)
         {
-            files = new DirectoryInfo(GetPath(fileName))
-                .GetFileSystemInfos()
-                .Select(finfo => new FileInformation
+            System.Console.WriteLine(GetPath(fileName));
+            files = new List<FileInformation>();
+            if (fileName == "\\")
+            {
+                files = GetAvaliableDrives().Aggregate(files, (current, avaliableDrive) => current.Concat(new DirectoryInfo(avaliableDrive.Name).GetFileSystemInfos().Select(finfo => new FileInformation
                 {
-                    Attributes =
-                        finfo.
-                        Attributes,
-                    CreationTime =
-                        finfo.
-                        CreationTime,
-                    LastAccessTime =
-                        finfo.
-                        LastAccessTime,
-                    LastWriteTime =
-                        finfo.
-                        LastWriteTime,
-                    Length =
-                        (finfo is
-                         FileInfo)
-                            ? ((
-                               FileInfo
-                               )finfo
-                              ).
-                                  Length
-                            : 0,
-                    FileName =
-                        finfo.Name,
-                }).ToArray();
+                    Attributes = finfo.Attributes, CreationTime = finfo.CreationTime, LastAccessTime = finfo.LastAccessTime, LastWriteTime = finfo.LastWriteTime, Length = (finfo is FileInfo) ? ((FileInfo) finfo).Length : 0, FileName = finfo.Name,
+                }).ToArray()).ToArray());
+
+//                foreach (DriveInfo avaliableDrive in GetAvaliableDrives())
+//                {
+//                    files = files.Concat(new DirectoryInfo(avaliableDrive.Name)
+//                        .GetFileSystemInfos()
+//                        .Select(finfo => new FileInformation
+//                        {
+//                            Attributes =
+//                                finfo.
+//                                    Attributes,
+//                            CreationTime =
+//                                finfo.
+//                                    CreationTime,
+//                            LastAccessTime =
+//                                finfo.
+//                                    LastAccessTime,
+//                            LastWriteTime =
+//                                finfo.
+//                                    LastWriteTime,
+//                            Length =
+//                                (finfo is
+//                                    FileInfo)
+//                                    ? ((
+//                                        FileInfo
+//                                        )finfo
+//                                        ).
+//                                        Length
+//                                    : 0,
+//                            FileName =
+//                                finfo.Name,
+//                        }).ToArray()).ToArray();
+//                }
+            }
+            else
+            {
+                Console.WriteLine("System Want:"+fileName);
+                files = new DirectoryInfo(AutoGetPath(fileName))
+                    .GetFileSystemInfos()
+                    .Select(finfo => new FileInformation
+                    {
+                        Attributes =
+                            finfo.
+                            Attributes,
+                        CreationTime =
+                            finfo.
+                            CreationTime,
+                        LastAccessTime =
+                            finfo.
+                            LastAccessTime,
+                        LastWriteTime =
+                            finfo.
+                            LastWriteTime,
+                        Length =
+                            (finfo is
+                             FileInfo)
+                                ? ((
+                                   FileInfo
+                                   )finfo
+                                  ).
+                                      Length
+                                : 0,
+                        FileName =
+                            finfo.Name,
+                    }).ToArray();
+            }
 
             return DokanResult.Success;
         }
